@@ -4,40 +4,61 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Broadcasting
+    | Filament Panel Configuration
     |--------------------------------------------------------------------------
-    |
-    | By uncommenting the Laravel Echo configuration, you may connect Filament
-    | to any Pusher-compatible websockets server.
-    |
-    | This will allow your users to receive real-time notifications.
-    |
     */
 
-    'broadcasting' => [
+    // 1. Filament panelinin URL kökü. Örneğin '/admin'
+    'path' => env('FILAMENT_PATH', 'admin'),
 
-        // 'echo' => [
-        //     'broadcaster' => 'pusher',
-        //     'key' => env('VITE_PUSHER_APP_KEY'),
-        //     'cluster' => env('VITE_PUSHER_APP_CLUSTER'),
-        //     'wsHost' => env('VITE_PUSHER_HOST'),
-        //     'wsPort' => env('VITE_PUSHER_PORT'),
-        //     'wssPort' => env('VITE_PUSHER_PORT'),
-        //     'authEndpoint' => '/broadcasting/auth',
-        //     'disableStats' => true,
-        //     'encrypted' => true,
-        //     'forceTLS' => true,
-        // ],
+    // 2. Domain (eğer alt alan kullanacaksanız)
+    'domain' => env('FILAMENT_DOMAIN'),
 
+    // 3. Middleware grubu
+    'middleware' => [
+        'web',
+        'auth',
+        'verified',
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Default Filesystem Disk
+    | Filament Auth Configuration
     |--------------------------------------------------------------------------
     |
-    | This is the storage disk Filament will use to store files. You may use
-    | any of the disks defined in the `config/filesystems.php`.
+    | ‘user’ anahtarı için Closure yerine [ClassName::class, 'method'] biçiminde
+    | seri hale getirilebilir (serializable) bir callable kullanıyoruz.
+    |
+    */
+
+    'auth' => [
+        'guard' => env('FILAMENT_AUTH_GUARD', 'web'),
+
+        // Closure yerine şu dizi formatı kullanılmalı:
+        'user' => [\App\Filament\FilamentUser::class, 'authorize'],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Filament Resources
+    |--------------------------------------------------------------------------
+    |
+    | Eğer Resource’ları elle listelemek isterseniz buraya ekleyin. Aksi takdirde
+    | Filament otomatik olarak App\Filament\Resources klasörünüzü tarar.
+    |
+    */
+
+    'resources' => [
+        \App\Filament\Resources\UserResource::class,
+        // Diğer Resource sınıflarınız varsa buraya ekleyebilirsiniz...
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Varsayılan Dosya Sistemi Diski (Filesystem Disk)
+    |--------------------------------------------------------------------------
+    |
+    | Filament’in dosya yükleme vs. için kullanacağı disk.
     |
     */
 
@@ -48,10 +69,7 @@ return [
     | Assets Path
     |--------------------------------------------------------------------------
     |
-    | This is the directory where Filament's assets will be published to. It
-    | is relative to the `public` directory of your Laravel application.
-    |
-    | After changing the path, you should run `php artisan filament:assets`.
+    | Filament asset’lerinin publish edileceği alt klasör (public altında).
     |
     */
 
@@ -62,10 +80,7 @@ return [
     | Cache Path
     |--------------------------------------------------------------------------
     |
-    | This is the directory that Filament will use to store cache files that
-    | are used to optimize the registration of components.
-    |
-    | After changing the path, you should run `php artisan filament:cache-components`.
+    | Filament bileşenleri için cache dosyalarının saklanacağı dizin.
     |
     */
 
@@ -76,14 +91,9 @@ return [
     | Livewire Loading Delay
     |--------------------------------------------------------------------------
     |
-    | This sets the delay before loading indicators appear.
-    |
-    | Setting this to 'none' makes indicators appear immediately, which can be
-    | desirable for high-latency connections. Setting it to 'default' applies
-    | Livewire's standard 200ms delay.
+    | Yükleniyor göstergesi gecikmesi: 'default' (200ms) veya 'none'.
     |
     */
 
     'livewire_loading_delay' => 'default',
-
 ];
