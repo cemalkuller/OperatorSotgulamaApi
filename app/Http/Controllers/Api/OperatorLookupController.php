@@ -4,20 +4,40 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Operator;
+use App\Models\OperatorQuery;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OperatorLookupController extends Controller
 {
     // GET /api/operator-lookup?number=5XXXXXXXXX
-
     public function lookup(Request $request)
     {
+        // 1. Kullanıcı oturumu kontrolü (sanctum, jwt vb. kullandıysanız middleware zaten Auth::user()'a izin verecek)
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Önce giriş yapmalısınız.'
+            ], 401);
+        }
+
         $number = $request->input('number');
+
+        // 2. Bugün için yapılan sorgu sayısını al
+        $usedCount = OperatorQuery::countTodayByUser($user->id);
+        $dailyLimit = $user->daily_limit; // users tablosundaki daily_limit sütunu
+
+        if ($usedCount >= $dailyLimit) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bugün sorgu limitinizi doldurdunuz.'
+            ], 429); // 429 Too Many Requests
+        }
+
         try {
             $cleanedNumber = preg_replace('/[^0-9]/', '', $number);
-
-
 
             if (strpos($cleanedNumber, '90') === 0) {
                 $cleanedNumber = '0' . substr($cleanedNumber, 2);
@@ -60,22 +80,36 @@ class OperatorLookupController extends Controller
             $decode = json_decode($data);
 
             if (isset($decode->route_id)) {
-                $operator = Operator::where('code', $decode->route_id)->first();
-                $response = $operator ? $operator->name : 'Bilinmiyor';
+                $operatorModel = Operator::where('code', $decode->route_id)->first();
+                $response = $operatorModel ? $operatorModel->name : 'Bilinmiyor';
             } else {
                 $response = false;
             }
+
+            // 3. Eğer burada bir sonuç (başarı veya “Bilinmiyor”) döndüysek,
+            //    operator_queries tablosuna bir kayıt ekleyelim:
+            OperatorQuery::create([
+                'user_id' => $user->id,
+                'phone_number' => $cleanedNumber,
+                'operator_name' => $response,
+            ]);
 
             return response()->json([
                 'success' => true,
                 'operator' => $response
             ]);
         } catch (Exception $e) {
+            // Eğer hata oluşursa yine kayıt ekleyebiliriz (operator_name = null veya “Hata”)
+            OperatorQuery::create([
+                'user_id' => $user->id,
+                'phone_number' => $cleanedNumber ?? $number,
+                'operator_name' => null,
+            ]);
+
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()
             ], 500);
         }
     }
-
 }

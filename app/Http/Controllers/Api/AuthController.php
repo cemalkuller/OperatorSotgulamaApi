@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\OperatorQuery;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,9 +24,17 @@ class AuthController extends Controller
         $user = Auth::user();
         $token = $user->createToken('desktop-app')->plainTextToken;
 
+        // Kullanıcının günlük limiti:
+        $dailyLimit = $user->daily_limit;
+
+        // Bugün yapılan sorgu sayısı:
+        $usedCount = OperatorQuery::countTodayByUser($user->id);
+
         return response()->json([
             'token' => $token,
             'user' => $user,
+            'daily_limit' => $dailyLimit,
+            'used_count' => $usedCount,
         ]);
     }
 
