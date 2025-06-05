@@ -27,7 +27,6 @@ class AuthController extends Controller
         // Kullanıcının günlük limiti:
         $dailyLimit = $user->daily_limit;
 
-        // Bugün yapılan sorgu sayısı:
         $usedCount = OperatorQuery::countTodayByUser($user->id);
 
         return response()->json([
