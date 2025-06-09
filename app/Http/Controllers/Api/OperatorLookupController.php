@@ -26,7 +26,8 @@ class OperatorLookupController extends Controller
         $number = $request->input('number');
 
         // 2. Bugün için yapılan sorgu sayısını al
-        $usedCount = OperatorQuery::countTodayByUser($user->id);
+        //$usedCount = OperatorQuery::countTodayByUser($user->id);
+        $usedCount = 100;
         $dailyLimit = $user->daily_limit; // users tablosundaki daily_limit sütunu
 
         if ($usedCount >= $dailyLimit) {
@@ -88,11 +89,11 @@ class OperatorLookupController extends Controller
 
             // 3. Eğer burada bir sonuç (başarı veya “Bilinmiyor”) döndüysek,
             //    operator_queries tablosuna bir kayıt ekleyelim:
-            OperatorQuery::create([
-                'user_id' => $user->id,
-                'phone_number' => $cleanedNumber,
-                'operator_name' => $response,
-            ]);
+            // OperatorQuery::create([
+            //     'user_id' => $user->id,
+            //     'phone_number' => $cleanedNumber,
+            //     'operator_name' => $response,
+            // ]);
 
             return response()->json([
                 'success' => true,
@@ -100,11 +101,11 @@ class OperatorLookupController extends Controller
             ]);
         } catch (Exception $e) {
             // Eğer hata oluşursa yine kayıt ekleyebiliriz (operator_name = null veya “Hata”)
-            OperatorQuery::create([
-                'user_id' => $user->id,
-                'phone_number' => $cleanedNumber ?? $number,
-                'operator_name' => null,
-            ]);
+            //   OperatorQuery::create([
+            //       'user_id' => $user->id,
+            //       'phone_number' => $cleanedNumber ?? $number,
+            //       'operator_name' => null,
+            //   ]);
 
             return response()->json([
                 'success' => false,
