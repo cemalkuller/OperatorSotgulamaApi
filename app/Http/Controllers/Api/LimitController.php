@@ -22,8 +22,7 @@ class LimitController extends Controller
      */
     public function limits(Request $request)
     {
-        // 1. Mevcut authenticated kullanıcıyı al
-        $user = $request->user(); // Auth::user()
+        $user = $request->user();
 
         if (!$user) {
             return response()->json([
@@ -31,29 +30,25 @@ class LimitController extends Controller
             ], 401);
         }
 
-        // 2. Kullanıcının günlük limitini al
         $dailyLimit = $user->daily_limit;
 
-        // 3. Bugün içinde yapılan sorgu sayısını hesapla
-        // Carbon ile bugünün başlangıcını ve sonunu bulup sorgula
-        $todayStart = Carbon::now()->startOfDay();
-        $todayEnd = Carbon::now()->endOfDay();
+        $userId = $user->id;
+        $today = date('Y-m-d');
+        $limitFile = storage_path('app/operator_limits.json');
 
-        $usedCount = OperatorQuery::where('user_id', $user->id)
-            ->whereBetween('created_at', [$todayStart, $todayEnd])
-            ->count();
+        // JSON dosyasını oku, yoksa boş dizi
+        $limits = file_exists($limitFile) ? json_decode(file_get_contents($limitFile), true) : [];
 
-        // 4. Kalan hakkı hesapla
-        $remaining = $dailyLimit - $usedCount;
-        if ($remaining < 0) {
-            $remaining = 0;
-        }
+        // Günlük kullanılan sorgu sayısını JSON'dan al
+        $usedCount = $limits[$today][$userId] ?? 0;
 
-        // 5. JSON olarak geri dön
+        $remaining = max(0, $dailyLimit - $usedCount);
+
         return response()->json([
             'daily_limit' => $dailyLimit,
             'used_count' => $usedCount,
             'remaining' => $remaining,
+            "batch_size" => 1000
         ]);
     }
 }
