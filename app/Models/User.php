@@ -22,6 +22,7 @@ class User extends Authenticatable
         'password',
         'daily_limit',
         'role',
+        'batch_size'
     ];
 
     /**
