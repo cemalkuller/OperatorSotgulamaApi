@@ -83,6 +83,12 @@ class UserResource extends Resource
                         ->required()
                         ->default(1000)
                         ->minValue(0),
+                    TextInput::make('batch_size')
+                        ->label('Batch Boyutu')
+                        ->numeric()
+                        ->default(1000)
+                        ->minValue(1)
+                        ->required(),
                 ]),
             ]);
     }

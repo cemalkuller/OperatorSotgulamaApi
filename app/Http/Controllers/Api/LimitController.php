@@ -48,7 +48,7 @@ class LimitController extends Controller
             'daily_limit' => $dailyLimit,
             'used_count' => $usedCount,
             'remaining' => $remaining,
-            "batch_size" => 1000
+            "batch_size" => $user->batch_size ?? 1000
         ]);
     }
 }
