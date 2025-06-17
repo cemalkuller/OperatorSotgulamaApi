@@ -13,6 +13,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Maatwebsite\Excel\Facades\Excel;
 
 class CashflowReport extends Page implements Tables\Contracts\HasTable
@@ -255,5 +256,26 @@ class CashflowReport extends Page implements Tables\Contracts\HasTable
             new ArrayExport($rows),
             'nakit_akisi_raporu.xlsx'
         );
+    }
+
+
+    public static function canViewAny(): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
     }
 }
