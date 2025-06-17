@@ -188,14 +188,14 @@ class CashflowReport extends Page implements Tables\Contracts\HasTable
 
         // Grafik: Aylık toplamlara böl
         $incomeData = (clone $query)->where('type', 'income')
-            ->selectRaw("TO_CHAR(date, 'YYYY-MM-DD') as day, SUM(amount) as total")
+            ->selectRaw("TO_CHAR(date, 'YYYY-MM-DD') as month, SUM(amount) as total")
             ->groupBy('month')
             ->orderBy('month')
             ->pluck('total', 'month')
             ->toArray();
 
         $expenseData = (clone $query)->where('type', 'expense')
-            ->selectRaw("TO_CHAR(date, 'YYYY-MM-DD') as day, SUM(amount) as total")
+            ->selectRaw("TO_CHAR(date, 'YYYY-MM-DD') as month, SUM(amount) as total")
             ->groupBy('month')
             ->orderBy('month')
             ->pluck('total', 'month')
