@@ -11,6 +11,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
+use Filament\Support\RawJs;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
@@ -19,7 +20,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\DateFilter;
 use Illuminate\Database\Eloquent\Builder;
-
+use Filament\Forms\Components\TextInput\Mask;
 class TransactionResource extends Resource
 {
     protected static ?string $model = Transaction::class;
@@ -47,19 +48,23 @@ class TransactionResource extends Resource
                     ->required(),
                 TextInput::make('amount')
                     ->label('Tutar')
+                    ->mask(RawJs::make('$money($input, \'.\', \',\', 2)'))
+                    ->stripCharacters([',', '.'])
                     ->numeric()
                     ->required(),
                 Select::make('category_id')
                     ->label('Kategori')
                     ->relationship('category', 'name')
-                    ->searchable()
-                    ->required(),
+                    ->required()
+                    ->searchable(false),
                 DatePicker::make('date')
                     ->label('Tarih')
+                    ->default(now()->toDateString())
                     ->required(),
                 Textarea::make('description')
                     ->label('Açıklama'),
             ]);
+
     }
 
     public static function table(Table $table): Table
