@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 
 class AppVersionResource extends Resource
@@ -107,5 +108,26 @@ class AppVersionResource extends Resource
             'create' => Pages\CreateAppVersion::route('/create'),
             'edit' => Pages\EditAppVersion::route('/{record}/edit'),
         ];
+    }
+
+
+    public static function canViewAny(): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
     }
 }

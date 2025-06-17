@@ -30,6 +30,7 @@ class CashflowReport extends Page implements Tables\Contracts\HasTable
     protected static ?string $modelLabel = 'Nakit Akışı Raporu';
     protected static ?string $modelPluralLabel = 'Nakit Akışı Raporları';
 
+    protected static ?int $navigationSort = 2;
     public static ?string $description = 'Seçili tarih ve filtrelere göre tüm gelir/gider kayıtlarınızı buradan tablo halinde inceleyin veya Excel’e aktarın.';
 
     // Chart ve özet alanları için:

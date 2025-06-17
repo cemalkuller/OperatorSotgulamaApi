@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class CategoryResource extends Resource
 {
@@ -20,6 +21,7 @@ class CategoryResource extends Resource
     protected static ?string $pluralModelLabel = 'Kategoriler'; // Breadcrumb ve başlıklar için
     protected static ?string $modelLabel = 'Kategori'; // Tekil başlık
 
+    protected static ?int $navigationSort = 3;
     public static function form(Form $form): Form
     {
         return $form
@@ -83,5 +85,25 @@ class CategoryResource extends Resource
             'create' => Pages\CreateCategory::route('/yeni'),
             'edit' => Pages\EditCategory::route('/{record}/duzenle'),
         ];
+    }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
     }
 }

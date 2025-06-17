@@ -21,6 +21,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\DateFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Forms\Components\TextInput\Mask;
+use Illuminate\Database\Eloquent\Model;
 class TransactionResource extends Resource
 {
     protected static ?string $model = Transaction::class;
@@ -35,6 +36,7 @@ class TransactionResource extends Resource
 
     protected static ?string $modelLabel = 'Nakit Akışı'; // Tekil başlık
 
+    protected static ?int $navigationSort = 1;
     public static function form(Form $form): Form
     {
         return $form
@@ -120,4 +122,25 @@ class TransactionResource extends Resource
             'edit' => Pages\EditTransaction::route('/{record}/duzenle'),
         ];
     }
+
+    public static function canViewAny(): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->check() && auth()->user()->role === 'admin';
+    }
+
 }
