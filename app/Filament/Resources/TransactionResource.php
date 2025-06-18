@@ -59,6 +59,11 @@ class TransactionResource extends Resource
                     ->relationship('category', 'name')
                     ->required()
                     ->searchable(false),
+                Select::make('payment_channel_id')
+                    ->label('Ödeme Kanalı')
+                    ->relationship('paymentChannel', 'name')
+                    ->required()
+                    ->searchable(false),
                 DatePicker::make('date')
                     ->label('Tarih')
                     ->default(now()->toDateString())
@@ -81,6 +86,8 @@ class TransactionResource extends Resource
                     ->money('TRY', true),
                 TextColumn::make('category.name')
                     ->label('Kategori'),
+                TextColumn::make('paymentChannel.name')
+                    ->label('Ödeme Kanalı'),
                 TextColumn::make('date')
                     ->label('Tarih')
                     ->date('d.m.Y'),
